@@ -1,0 +1,15 @@
+name: CI
+on: push          # push, not pull_request — per CLAUDE.md the trigger
+                  # must not depend on PR state
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Reject TODOs
+        run: |
+          if grep -rn "TODO" --include="*.md" --include="*.py" . ; then
+            echo "::error::Found TODO markers"
+            exit 1
+          fi
+          echo "No TODOs found"
