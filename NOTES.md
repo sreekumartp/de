@@ -1,1 +1,1 @@
-TODO: write the real notes
+Placeholder: write the real notes
