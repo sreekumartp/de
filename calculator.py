@@ -9,6 +9,7 @@ _OPERATIONS = {
     "-": operator.sub,
     "*": operator.mul,
     "/": operator.truediv,
+    "%": operator.mod,
 }
 
 
@@ -17,7 +18,7 @@ def calculate(left: float, op: str, right: float) -> float:
 
     Args:
         left: The left-hand operand.
-        op: One of ``+``, ``-``, ``*``, ``/``.
+        op: One of ``+``, ``-``, ``*``, ``/``, ``%``.
         right: The right-hand operand.
 
     Returns:
@@ -25,12 +26,16 @@ def calculate(left: float, op: str, right: float) -> float:
 
     Raises:
         ValueError: If ``op`` is not a supported operator.
-        ZeroDivisionError: If dividing by zero.
+        ZeroDivisionError: If ``right`` is zero and ``op`` is ``/`` or ``%``.
 
     >>> calculate(2, "+", 3)
     5
     >>> calculate(7, "/", 2)
     3.5
+    >>> calculate(7, "%", 3)
+    1
+    >>> calculate(-7, "%", 3)
+    2
     """
     try:
         func = _OPERATIONS[op]
