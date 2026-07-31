@@ -13,6 +13,9 @@ _OPERATIONS = {
     "%": operator.mod,
 }
 
+# Trig functions are unary, so they cannot live in _OPERATIONS (which is
+# dispatched as ``func(left, right)``). They get their own table and their own
+# entry point, ``calculate_trig``.
 _TRIG_OPERATIONS = {
     "sin": math.sin,
     "cos": math.cos,
@@ -23,7 +26,10 @@ _TRIG_OPERATIONS = {
 }
 
 # Functions that return an angle rather than consuming one; the ``degrees``
-# flag converts their result instead of their argument.
+# flag converts their result instead of their argument. Kept as an explicit set
+# rather than an ``op.startswith("a")`` test, which would wrongly classify
+# future entries such as ``atan2`` (consumes no angle, returns one but takes two
+# arguments) or ``abs``.
 _INVERSE_TRIG = frozenset({"asin", "acos", "atan"})
 
 
@@ -89,13 +95,26 @@ def calculate_trig(op: str, value: float, *, degrees: bool = False) -> float:
     try:
         func = _TRIG_OPERATIONS[op]
     except KeyError:
+        # ``from None`` hides the internal KeyError, so a caller who passed a
+        # bad name sees only the ValueError naming the valid options. Mirrors
+        # the lookup in ``calculate``.
         supported = ", ".join(sorted(_TRIG_OPERATIONS))
         raise ValueError(f"unsupported function {op!r}; expected one of: {supported}") from None
 
+    # The ``degrees`` flag applies to whichever side of the call is an angle,
+    # and that differs by direction: sin/cos/tan take an angle and return a
+    # ratio, while asin/acos/atan take a ratio and return an angle. So convert
+    # the input for the forward functions and the output for the inverse ones —
+    # never both, or the conversion would cancel itself out.
     inverse = op in _INVERSE_TRIG
     if degrees and not inverse:
         value = math.radians(value)
+
+    # A domain error here (asin/acos outside [-1, 1]) is deliberately left to
+    # propagate as math's own ValueError, matching how ``calculate`` lets
+    # ZeroDivisionError through rather than repackaging it.
     result = func(value)
+
     if degrees and inverse:
         result = math.degrees(result)
     return result
