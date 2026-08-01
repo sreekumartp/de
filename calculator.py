@@ -72,20 +72,37 @@ def compound(
     *,
     compounds_per_year: float = 1,
 ) -> float:
-    """Grow a principal at a fixed interest rate and return the final amount.
+    """
+    Grows a principal at a fixed interest rate and returns the final amount.
 
-    Interest is compounded ``compounds_per_year`` times per year, so the result
-    is ``principal * (1 + rate / n) ** (n * years)``.
+    Interest is compounded ``compounds_per_year`` times per year, so the
+    result is ``principal * (1 + rate / n) ** (n * years)``.
 
     Args:
-        principal: The starting amount. May be negative to model a debt.
-        rate: The nominal annual interest rate as a fraction, not a
-            percentage: 5% is ``0.05``. A negative rate models depreciation.
-        years: The number of years to compound over. Need not be a whole
-            number; ``0`` returns the principal unchanged.
-        compounds_per_year: How many times per year interest is applied — 1
-            for annual, 12 for monthly, 365 for daily. Need not divide evenly
-            into ``years``.
+        principal:
+            The starting amount. May be negative to model a debt.
+
+        rate:
+            The nominal annual interest rate as a fraction, not a percentage:
+            5% is 0.05. A negative rate models depreciation.
+
+        years:
+            The number of years to compound over. Need not be a whole number.
+            Zero returns the principal unchanged.
+
+        compounds_per_year:
+            How many times per year interest is applied. Any positive number
+            is accepted, and it need not divide evenly into ``years``. Common
+            values:
+
+            1
+                annually (the default)
+            4
+                quarterly
+            12
+                monthly
+            365
+                daily
 
     Returns:
         The final amount, including the principal. Subtract ``principal`` to
@@ -93,19 +110,21 @@ def compound(
         rounding for display is left to the caller.
 
     Raises:
-        ValueError: If ``years`` is negative, if ``compounds_per_year`` is not
-            positive, or if ``rate`` is so negative that a period wipes out
-            more than the whole balance (``rate / compounds_per_year < -1``),
-            which would flip the sign of the principal on every period.
+        ValueError:
+            If ``years`` is negative, if ``compounds_per_year`` is not
+            positive, or if a single period would lose more than the entire
+            balance. The last case means a periodic rate below -100%, which
+            would flip the sign of the principal on every period.
 
-    >>> round(compound(1000, 0.05, 10), 2)
-    1628.89
-    >>> round(compound(1000, 0.05, 10, compounds_per_year=12), 2)
-    1647.01
-    >>> compound(1000, 0.05, 0)
-    1000.0
-    >>> round(compound(1000, -0.10, 3), 2)
-    729.0
+    Examples:
+        >>> round(compound(1000, 0.05, 10), 2)
+        1628.89
+        >>> round(compound(1000, 0.05, 10, compounds_per_year=12), 2)
+        1647.01
+        >>> compound(1000, 0.05, 0)
+        1000.0
+        >>> round(compound(1000, -0.10, 3), 2)
+        729.0
     """
     if years < 0:
         raise ValueError(f"years must not be negative; got {years!r}")
