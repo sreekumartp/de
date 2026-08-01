@@ -1,5 +1,3 @@
-# TODO: add JSON output format
-
 def summarise(quality_report):
     """
     Format a quality report dict as a short plain-text report.
