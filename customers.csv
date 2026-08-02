@@ -1,0 +1,9 @@
+customer_id,name,country,signup_date
+C001,Ada Lovelace,UK,2023-01-15
+C002,Grace Hopper,USA,2023-03-02
+C003,Alan Turing,UK,2023-05-20
+C004,Katherine Johnson,USA,2023-06-11
+C005, Linus Torvalds ,Finland,2023-08-30
+C006,Margaret Hamilton,USA,2023-09-14
+C007,Dennis Ritchie,USA,2023-11-01
+C008,Barbara Liskov,USA,2024-01-07
